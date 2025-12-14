@@ -10,7 +10,8 @@ from pathlib import Path
 GITHUB_REPO_PATH = Path(__file__).parent
 HTML_FILE = GITHUB_REPO_PATH / "index.html"
 
-PROTOCOL = "http"   # mets "https" quand ta box est bien configurée en HTTPS
+PROTOCOL = "http"   # mets "https" quand ta box sera bien configurée
+PORT = 5000         # port de ton service (ex: Flask)
 IP_SERVICE = "https://api.ipify.org"
 
 # =========================
@@ -25,10 +26,16 @@ def get_public_ip():
 
 
 def read_current_url(html_content):
-    """Extrait l'URL actuelle définie dans TARGET_URL"""
-    match = re.search(r'const\s+TARGET_URL\s*=\s*"([^"]+)"', html_content)
+    """
+    Extrait l'URL actuelle définie dans :
+    const TARGET_URL = "..."
+    """
+    match = re.search(
+        r'const\s+TARGET_URL\s*=\s*"([^"]+)"',
+        html_content
+    )
     if not match:
-        raise ValueError("TARGET_URL non trouvé dans index.html")
+        raise ValueError("❌ TARGET_URL non trouvé dans index.html")
     return match.group(1)
 
 
@@ -42,10 +49,10 @@ def update_html_url(html_content, new_url):
 
 
 def git_commit_and_push():
-    """Commit + push sans exposer l’IP"""
+    """Commit + push sans exposer l’IP publique"""
     subprocess.run(["git", "add", "index.html"], check=True)
     subprocess.run(
-        ["git", "commit", "-m", "🔁 Mise à jour du transfert"],
+        ["git", "commit", "-m", "🔁 Mise à jour du transfert FrameConnect"],
         check=True
     )
     subprocess.run(["git", "push"], check=True)
@@ -59,7 +66,7 @@ def main():
     print("🔍 Vérification de l'IP publique…")
 
     public_ip = get_public_ip()
-    new_url = f"{PROTOCOL}://{public_ip}"
+    new_url = f"{PROTOCOL}://{public_ip}:{PORT}"
 
     html = HTML_FILE.read_text(encoding="utf-8")
     current_url = read_current_url(html)
@@ -68,7 +75,7 @@ def main():
         print("✅ Aucun changement détecté")
         return
 
-    print("⚠️ Changement détecté, mise à jour en cours…")
+    print(f"⚠️ Changement détecté :\n   {current_url}\n→  {new_url}")
 
     updated_html = update_html_url(html, new_url)
     HTML_FILE.write_text(updated_html, encoding="utf-8")

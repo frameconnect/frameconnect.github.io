@@ -37,6 +37,7 @@
       background: linear-gradient(135deg, #ff9a5a, #7f7cff, #ff7ce8);
       background-size: 300% 300%;
       animation: gradientShift 15s ease infinite;
+      padding: 16px;
     }
 
     @keyframes gradientShift {
@@ -45,17 +46,8 @@
       100% { background-position: 0% 50%; }
     }
 
-    #overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-
     .card {
-      max-width: 420px;
+      max-width: 440px;
       padding: 36px 32px;
       text-align: center;
       border-radius: var(--border-radius-xl);
@@ -73,71 +65,69 @@
     h1 {
       font-size: 22px;
       font-weight: 600;
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       color: #111827;
     }
 
     p {
       font-size: 15px;
-      margin: 0;
+      margin: 0 0 14px;
       color: #4b5563;
+      line-height: 1.5;
     }
 
-    .spinner {
-      margin: 26px auto 0;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 3px solid rgba(0,0,0,.15);
-      border-top-color: var(--accent);
-      animation: spin 1s linear infinite;
+    .button {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 14px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 10px 24px rgba(47, 128, 237, 0.35);
+      transition: transform .15s ease, box-shadow .15s ease;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(47, 128, 237, 0.45);
+    }
+
+    .note {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #6b7280;
     }
   </style>
 </head>
 
 <body>
 
-  <div id="overlay">
-    <div class="card">
-      <img src="FrameConnect.png" class="logo" alt="FrameConnect">
-      <h1 id="title">Connexion en cours de FrameConnect</h1>
-      <p id="message">Veuillez patienter quelques instants</p>
-      <div class="spinner" id="spinner"></div>
-    </div>
+  <div class="card">
+    <img src="FrameConnect.png" class="logo" alt="FrameConnect">
+
+    <h1>Bienvenue sur FrameConnect</h1>
+
+    <p>
+      Cette page est une passerelle de redirection vers l’interface FrameConnect.
+    </p>
+
+    <p>
+      Le transfert automatique sera activé dans les prochains jours.
+      En attendant, merci d’utiliser le bouton ci-dessous.
+    </p>
+
+    <a href="http://31.38.191.62:5000" class="button">
+      Accéder à FrameConnect
+    </a>
+
+    <p class="note">
+      Nous vous recommandons d’ajouter dès maintenant ce site
+      à l’écran d’accueil de votre téléphone pour un accès rapide.
+    </p>
   </div>
-
-  <script>
-    const TARGET_URL = "http://31.38.191.62:5000";
-    const TIMEOUT = 8000;
-
-    const title = document.getElementById("title");
-    const message = document.getElementById("message");
-    const spinner = document.getElementById("spinner");
-
-    let redirected = false;
-
-    function showError() {
-      title.textContent = "Un problème est survenu";
-      message.textContent = "Merci d’avertir Thomas";
-      spinner.style.display = "none";
-    }
-
-    // Sécurité : si la redirection ne se fait pas
-    const timeout = setTimeout(() => {
-      if (!redirected) showError();
-    }, TIMEOUT);
-
-    // Petite pause pour laisser voir l'écran "FrameConnect"
-    setTimeout(() => {
-      redirected = true;
-      clearTimeout(timeout);
-      window.location.href = TARGET_URL;
-    }, 1200);
-  </script>
 
 </body>
 </html>
