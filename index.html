@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>FrameConnect</title>
+
+  <!-- Icône -->
+  <link rel="icon" type="image/png" href="FrameConnect.png" />
+  <link rel="apple-touch-icon" href="FrameConnect.png" />
+
+  <style>
+    :root {
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --border-radius-xl: 24px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
+      --accent: #2f80ed;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                   system-ui, -system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ff9a5a, #7f7cff, #ff7ce8);
+      background-size: 300% 300%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Iframe */
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+      display: none;
+      background: transparent;
+    }
+
+    /* Overlay */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    #overlay.hidden {
+      display: none;
+    }
+
+    .card {
+      max-width: 420px;
+      padding: 36px 32px;
+      text-align: center;
+      border-radius: var(--border-radius-xl);
+      background: var(--card-bg);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 10px;
+      color: #111827;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      font-size: 15px;
+      margin: 0;
+      color: #4b5563;
+      line-height: 1.45;
+    }
+
+    .spinner {
+      margin: 26px auto 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 3px solid rgba(0,0,0,.15);
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Overlay -->
+  <div id="overlay">
+    <div class="card">
+      <img src="FrameConnect.png" class="logo" alt="FrameConnect">
+      <h1 id="title">Connexion en cours de FrameConnect</h1>
+      <p id="message">Veuillez patienter quelques instants</p>
+      <div class="spinner" id="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Iframe -->
+  <iframe id="frame" referrerpolicy="no-referrer"></iframe>
+
+  <script>
+    const TARGET_URL = "http://127.0.0.1:5050";
+    const TIMEOUT = 8000;
+
+    const frame = document.getElementById("frame");
+    const overlay = document.getElementById("overlay");
+    const title = document.getElementById("title");
+    const message = document.getElementById("message");
+    const spinner = document.getElementById("spinner");
+
+    let loaded = false;
+
+    function showError() {
+      title.textContent = "Un problème est survenu";
+      message.textContent = "Merci d’avertir Thomas";
+      spinner.style.display = "none";
+      overlay.classList.remove("hidden");
+      frame.style.display = "none";
+    }
+
+    function showFrame() {
+      overlay.classList.add("hidden");
+      frame.style.display = "block";
+    }
+
+    const timeout = setTimeout(() => {
+      if (!loaded) showError();
+    }, TIMEOUT);
+
+    frame.onload = () => {
+      loaded = true;
+      clearTimeout(timeout);
+      showFrame();
+    };
+
+    frame.onerror = () => {
+      clearTimeout(timeout);
+      showError();
+    };
+
+    frame.src = TARGET_URL;
+  </script>
+
+</body>
+</html>
