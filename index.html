@@ -111,6 +111,35 @@
       animation: spin 1s linear infinite;
     }
 
+    .manual-button {
+      margin-top: 22px;
+      display: inline-block;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 999px;
+      text-decoration: none;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .manual-button.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .manual-button:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -130,6 +159,9 @@
 
 
     <div class="loader" aria-label="Chargement"></div>
+    <a id="manualBtn" class="manual-button" href="#">
+      Continuer manuellement
+    </a>
 
     <p class="note">
       Un problème ! Contactez le fondateur de FrameConnect...
@@ -138,8 +170,20 @@
 
 </body>
   <script>
+    const REDIRECT_DELAY = 2000;
+    const targetUrl = "http://31.38.191.62:5000";
+
+    const manualBtn = document.getElementById("manualBtn");
+
+    // Redirection automatique
     setTimeout(() => {
-      window.location.href = "http://31.38.191.62:5000";
-    }, 1000);
+      window.location.href = targetUrl;
+    }, REDIRECT_DELAY);
+
+    // Apparition du bouton manuel après 2 secondes (style Apple)
+    setTimeout(() => {
+      manualBtn.classList.add("show");
+      manualBtn.href = targetUrl;
+    }, REDIRECT_DELAY);
   </script>
 </html>
