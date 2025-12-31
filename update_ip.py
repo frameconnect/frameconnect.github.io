@@ -9,6 +9,7 @@ from pathlib import Path
 
 GITHUB_REPO_PATH = Path(__file__).parent
 HTML_FILE = GITHUB_REPO_PATH / "index.html"
+REDIRECT_REGEX = r'window\.location\.href\s*=\s*"([^"]+)"'
 
 PROTOCOL = "http"   # mets "https" quand ta box sera bien configurée
 PORT = 5000         # port de ton service (ex: Flask)
@@ -27,35 +28,35 @@ def get_public_ip():
 
 def read_current_url(html_content):
     """
-    Extrait l'URL actuelle définie dans :
-    const TARGET_URL = "..."
+    Extrait l'URL actuelle depuis le script de redirection JS.
     """
-    match = re.search(
-        r'const\s+TARGET_URL\s*=\s*"([^"]+)"',
-        html_content
-    )
+    match = re.search(REDIRECT_REGEX, html_content)
     if not match:
-        raise ValueError("❌ TARGET_URL non trouvé dans index.html")
+        raise ValueError(
+            "❌ Redirection window.location.href non trouvée dans index.html"
+        )
     return match.group(1)
 
 
 def update_html_url(html_content, new_url):
-    """Met à jour TARGET_URL dans le HTML"""
+    """
+    Met à jour l'URL dans le script window.location.href
+    """
     return re.sub(
-        r'const\s+TARGET_URL\s*=\s*"[^"]+"',
-        f'const TARGET_URL = "{new_url}"',
+        REDIRECT_REGEX,
+        f'window.location.href = "{new_url}"',
         html_content
     )
 
 
 def git_commit_and_push():
-    """Commit + push sans exposer l’IP publique"""
+    """Commit + push forcé (-f)"""
     subprocess.run(["git", "add", "index.html"], check=True)
     subprocess.run(
-        ["git", "commit", "-m", "🔁 Mise à jour du transfert FrameConnect"],
+        ["git", "commit", "-m", "🔁 Mise à jour automatique FrameConnect"],
         check=True
     )
-    subprocess.run(["git", "push"], check=True)
+    subprocess.run(["git", "push", "-f"], check=True)
 
 
 # =========================
@@ -69,6 +70,8 @@ def main():
     new_url = f"{PROTOCOL}://{public_ip}:{PORT}"
 
     html = HTML_FILE.read_text(encoding="utf-8")
+    if "window.location.href" not in html:
+        raise RuntimeError("❌ Aucune redirection JS détectée dans index.html")
     current_url = read_current_url(html)
 
     if current_url == new_url:
